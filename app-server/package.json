@@ -1,0 +1,19 @@
+{
+  "name": "app-server",
+  "version": "1.0.0",
+  "description": "Fastify Demo App",
+  "main": "server.js",
+  "scripts": {
+    "start": "PORT=3000 node server.js",
+    "start2": "PORT=3001 node server.js",
+    "start3": "PORT=3002 node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Seb Barre <sebastien.barre@telus.com>",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^3.6.0",
+    "fastify-static": "^3.2.1",
+    "moment": "^2.29.1"
+  }
+}

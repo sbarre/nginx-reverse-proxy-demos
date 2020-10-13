@@ -1,0 +1,17 @@
+body {
+  background-color: #adf;
+  margin: 20px;
+  font-family: "Helvetica Neue";
+  font-weight: 200;
+}
+
+h1 {
+  color: #000;
+}
+
+pre {
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: #eee;
+}
