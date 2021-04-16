@@ -22,3 +22,10 @@ services:
       - ./full-cache/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./app-server/public:/var/www/nginx/html/public:ro
       - ./full-cache/cache:/var/tmp
+  error_handling:
+    image: nginx:alpine
+    ports:
+      - "8083:8080"
+    volumes:
+      - ./error-handling/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./error-handling/basic_auth:/etc/nginx/basic_auth:ro

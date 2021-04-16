@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "PORT=3000 node server.js",
-    "start2": "PORT=3001 node server.js",
-    "start3": "PORT=3002 node server.js",
+    "start3": "PORT=3000 node server.js & PORT=3001 node server.js & PORT=3002 node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Seb Barre <sebastien.barre@telus.com>",
