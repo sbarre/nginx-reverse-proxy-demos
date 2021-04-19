@@ -1,4 +1,4 @@
-# Nginx demos showing off a few key features
+# Nginx demos showing off various reverse proxy strategies
 
 This repository sets up a basic Fastify Node app, and provides a set of nginx docker containers that proxy this Node application in order to demonstrate a variety of nginx features.
 
