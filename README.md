@@ -182,3 +182,61 @@ In a different terminal session, from the root of the project, run `docker-compo
 Visit [http://localhost:8083/](http://localhost:8083) to see the application being proxied.
 
 To stop both apps, you can press CTRL-C in the appropriate terminal.
+
+## Nginx JS Module (Port 8084)
+
+In this configuration, we demonstrate the nginx Javascript module that can be used to do more complex logic on your requests.
+
+Start the node app by switching to the **app-server** folder and running `npm run start`. This will run the app on port [3000](http://localhost:3000).
+
+In a different terminal session, from the root of the project, run `docker-compose up` to bring up the containers.
+
+Visit [http://localhost:8084/](http://localhost:8084) to see the application homepage.
+
+Visit [http://localhost:8084/uppercase](http://localhost:8084/uppercase) to see the application homepage after being run through an upper-case filter.
+
+In this example we must replace the whole nginx configuration rather than just the default include, because we have to load the nginx module at the top of the file in the global scope:
+
+```nginx
+load_module /usr/lib/nginx/modules/ngx_http_js_module.so;
+```
+
+Then in our `http` scope we have to import our scripts file:
+
+```nginx
+js_import scripts/http.js;
+```
+
+And finally inside our `server` block, we have the following two location blocks:
+
+```nginx
+location / {
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Nginx-Proxy true;
+  proxy_pass http://host.docker.internal:3000;
+  proxy_set_header Host $http_host;
+  proxy_cache_bypass $http_upgrade;
+  proxy_redirect off;
+}
+
+location ~ /uppercase {
+  js_content http.uppercase;
+}
+```
+
+The first block is simply creating a proxy to our underlying node application. The second block creates a `/uppercase` location that will call our Javascript function that proxies the main location and returns a response that uppercases parts of the page in real-time.
+
+Look at the `js-module/scripts/http.js` file to see the script that does the request manipulation. It's pretty basic but it demonstrates how you make a subrequest and manipulate it on the fly before returning it to the client.
+
+To stop both apps, you can press CTRL-C in the appropriate terminal.
+
+#### Further reading
+
+Nginx Javascript is quite powerful but not a particularly popular feature, and so it can be hard to find out how to use it well due to the lack of examples available in the community.
+
+The [official documentation](https://nginx.org/en/docs/njs/) provides a good introduction (the References and Examples section will be of most use).
+
+Be sure to also review the [compatibility guide](http://nginx.org/en/docs/njs/compatibility.html) to understand the subset of Javascript that is available to you.
+
+The [njs-examples](https://github.com/xeioex/njs-examples) Github repo has additional examples of NJS usage.
