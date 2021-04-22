@@ -2,7 +2,13 @@
 
 This repository sets up a basic Fastify Node app, and provides a set of nginx docker containers that proxy this Node application in order to demonstrate a variety of nginx features.
 
-### Initial Setup
+- [Reverse Proxy](#reverse-proxy-port-8080)
+- [Static Serving](#static-serving-port-8081)
+- [Full Cache](#full-cache-port-8082)
+- [Error Handling](#error-handling-port-8083)
+- [Nginx JS Module](#nginx-js-module-port-8084)
+
+### Initial Setup for all demos
 
 1. You need to have Node (v12+) and Docker installed on your machine.
 1. From the `app-server` folder, run `npm install` to download the Node app dependencies.
@@ -117,7 +123,9 @@ location /public {
 }
 ```
 
-**Important Note**: For this to work, nginx needs to have filesystem access to the static assets of your dynamic application. If both nginx and your app are running on the same server, this is straightforward. However, if your application is not running on the same server, you may need to mount the filesystem across the network, which is not always possible, or desirable.
+#### Limitations
+
+For this to work, nginx needs to have filesystem access to the static assets of your dynamic application. If both nginx and your app are running on the same server, this is straightforward. However, if your application is not running on the same server, you may need to mount the filesystem across the network, which is not always possible, or desirable.
 
 In this demo we are mounting the static file path as a read-only volume into the nginx Docker container:
 
@@ -161,7 +169,7 @@ location = /my-ip {
 
 ## Full Cache (Port 8082)
 
-In this configuration, nginx acts as a reverse proxy to a dynamic web application and caches the complete output of the app on a specified time interval.
+In this configuration, nginx acts as a reverse proxy to a dynamic web application and caches the (almost) complete output of the app on a specified time interval.
 
 Start the node app by switching to the **app-server** folder and running `npm run start`. This will run the app on port [3000](http://localhost:3000).
 
@@ -170,6 +178,53 @@ In a different terminal session, from the root of the project, run `docker-compo
 Visit [http://localhost:8082/](http://localhost:8082) to see the application being proxied with full caching.
 
 To stop both apps, you can press CTRL-C in the appropriate terminal.
+
+To set up the full proxy cache, you must start by adding a cache directive to your main nginx configuration:
+
+```nginx
+proxy_cache_path /var/tmp/cache max_size=20m keys_zone=appcache:10m;
+```
+
+In the directive above, we are setting the path to the cache at `/var/tmp/cache` on the server that nginx is running on, _not_ the server being proxied. Unlike the static serving strategy in the previous demo, you can use nginx's caching strategy even when nginx and your app server are on different machines.
+
+We then set the `max_size=20m` directive which tells nginx to use a maximum of 20 megabytes for caching. This directive is optional but it is a good practice to set anyways. You will need to adjust this value to your specific scenario but remember that this strategy will cache _all_ requests coming from th configured locations, including images, videos and other assets. This may or may not be what you want to do.
+
+The next directive `keys_zone:appcache:10m` defines a named cache zone and its size. We will reference this name in our `server` block later.
+
+Once we have this initial setup, we declare our caching parameters in our server block:
+
+```nginx
+proxy_cache appcache;
+proxy_cache_methods GET;
+proxy_cache_valid 200 1m;
+proxy_cache_valid 404 10m;
+```
+
+We first reference our cache zone `appcache` that we defined earlier, and we declare which request methods we want to cahed (in this case we only cache GET calls). We then further declare that we only want to cache responses that have 200 or 404 status codes, and then for how long we want to cache them (1 minute and 10 minutes respectively).
+
+This declares the overall caching strategy for all locations within this server block. However, we can adjust or override this behaviour on per-server block:
+
+```nginx
+location = /favicon.ico {
+  access_log off;
+  proxy_no_cache 1;
+  empty_gif;
+}
+
+location /public {
+  proxy_cache_valid 200 60m;
+}
+```
+
+Using the `proxy_no_cache` directive we tell nginx not to cache the `/favicon.ico` location because we are generating that one ourselves and returning an empty GIF directly from nginx, and we are telling nginx to cache the `/public` path which serves all the static assets (JS, CSS, images) for 60 minutes at at time, since these assets are unlikely to change.
+
+#### Further considerations
+
+While this approach can have noticeable performance benefits for your application, you must consider the impact it can have on dynamic pages, particularly if you are doing per-user customization. Nginx caches globally _for all users_ and not per-user.
+
+The [proxy_cache_key](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_key) directive gives you more control over how nginx determines if a given request has been cached, and you can incorporate elements such as a user's cookie string into the key to do per-user caching (but then think about the size of your cache depending on how many users you have).
+
+A more [extensive guide to caching](https://www.nginx.com/blog/nginx-caching-guide/) is also available on the nginx website, along with the [proxy module docs](http://nginx.org/en/docs/http/ngx_http_proxy_module.html) that cover all the possible options and settings for proxy caching.
 
 ## Error Handling (Port 8083)
 

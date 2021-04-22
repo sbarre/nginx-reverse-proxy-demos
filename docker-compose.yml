@@ -24,7 +24,7 @@ services:
     volumes:
       - ./full-cache/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./app-server/public:/var/www/nginx/html/public:ro
-      - ./full-cache/cache:/var/tmp
+      - ./full-cache/cache:/var/tmp/cache
   error_handling:
     image: nginx:alpine
     container_name: error_handling
