@@ -1,9 +1,12 @@
 const fastify = require("fastify")({
-  logger: true,
+  logger: {
+    prettyPrint: { ignore: "msg,time,level,pid,method", singleLine: true },
+  },
 });
 const path = require("path");
 const moment = require("moment");
 const util = require("util");
+const { pid } = require("process");
 
 const port = process.env.PORT || 3000;
 
@@ -38,7 +41,8 @@ fastify.get("/", async (request, reply) => {
       <h1>Homepage ${port}</h1>
       <h3>Hi ${userName}, it is ${date}, but it's still ${year}</h3>
       <h4>Server time: ${serverTime}</h4>
-      <h4>Browser time: <span id="browserTime"></span></h4>
+      <div><strong>Browser time: <span id="browserTime"></span></strong></div>
+      <hr>
       <img src="/public/images/2020.gif">
       <pre>${util.inspect(request.headers)}</pre>
       <script src="/public/js/moment-with-locales.js"></script>

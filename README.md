@@ -7,6 +7,7 @@ This repository sets up a basic Fastify Node app, and provides a set of nginx do
 - [Full Cache](#full-cache-port-8082)
 - [Error Handling](#error-handling-port-8083)
 - [Nginx JS Module](#nginx-js-module-port-8084)
+- [Nginx Split Clients Module](#nginx-split-clients-module-port-8085)
 
 ### Initial Setup for all demos
 
@@ -295,3 +296,13 @@ The [official documentation](https://nginx.org/en/docs/njs/) provides a good int
 Be sure to also review the [compatibility guide](http://nginx.org/en/docs/njs/compatibility.html) to understand the subset of Javascript that is available to you.
 
 The [njs-examples](https://github.com/xeioex/njs-examples) Github repo has additional examples of NJS usage.
+
+## Nginx Split Clients Module (Port 8085)
+
+In this configuration, we demonstrate the nginx Split Clients module (with some help from the JS module) that can be used to do more complex logic on your requests.
+
+Start the node app by switching to the **app-server** folder and running `npm run start3`. This will run 3 copies of the the Node app on ports 3000, 3001 and 3002 like our first demo.
+
+In a different terminal session, from the root of the project, run `docker-compose up` to bring up the containers.
+
+Visit [http://localhost:8085/](http://localhost:8085) to see the application homepage.

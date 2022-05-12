@@ -41,3 +41,11 @@ services:
     volumes:
       - ./js-module/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./js-module/scripts:/etc/nginx/scripts:ro
+  split_clients:
+    image: nginx:alpine
+    container_name: split_clients
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./split-clients/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./split-clients/scripts:/etc/nginx/scripts:ro
