@@ -6,7 +6,6 @@ const fastify = require("fastify")({
 const path = require("path");
 const moment = require("moment");
 const util = require("util");
-const { pid } = require("process");
 
 const port = process.env.PORT || 3000;
 

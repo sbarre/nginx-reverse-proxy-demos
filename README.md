@@ -1,4 +1,4 @@
-# Nginx demos showing off various reverse proxy strategies
+# Nginx demos showing off various proxy strategies
 
 This repository sets up a basic Fastify Node app, and provides a set of nginx docker containers that proxy this Node application in order to demonstrate a variety of nginx features.
 
@@ -8,11 +8,12 @@ This repository sets up a basic Fastify Node app, and provides a set of nginx do
 - [Error Handling](#error-handling-port-8083)
 - [Nginx JS Module](#nginx-js-module-port-8084)
 - [Nginx Split Clients Module](#nginx-split-clients-module-port-8085)
+- [Nginx Cache On Error](#nginx-cache-on-error-port-8086)
 
 ### Initial Setup for all demos
 
 1. You need to have Node (v12+) and Docker installed on your machine.
-1. From the `app-server` folder, run `npm install` to download the Node app dependencies.
+2. From the `app-server` folder, run `npm install` to download the Node app dependencies.
 
 ## Reverse Proxy (Port 8080)
 
@@ -306,3 +307,7 @@ Start the node app by switching to the **app-server** folder and running `npm ru
 In a different terminal session, from the root of the project, run `docker-compose up` to bring up the containers.
 
 Visit [http://localhost:8085/](http://localhost:8085) to see the application homepage.
+
+## Nginx Cache On Error (Port 8086)
+
+Serve a cached version when the backend is down.

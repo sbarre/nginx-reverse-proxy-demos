@@ -1,3 +1,4 @@
+cache-on-err/cache
 full-cache/cache
 app-server/auth
 .env
