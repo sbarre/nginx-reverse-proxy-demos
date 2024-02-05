@@ -1,7 +1,7 @@
 version: "3"
 services:
   node_app_server:
-    build: ./app-server/Dockerfile
+    build: ./app-server
     container_name: node_app_server
     ports:
       - "3000:3000"
