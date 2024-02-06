@@ -64,3 +64,18 @@ services:
     volumes:
       - ./cache-on-error/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./cache-on-error/cache:/var/tmp/cache
+#  nginx_lua:
+#    image: nginx-lua
+#    container_name: nginx_lua
+#    ports:
+#      - "8087:8080"
+#    volumes:
+#      - ./lua/nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./lua/scripts:/etc/nginx/scripts:ro
+  upstream_backup:
+    image: nginx:alpine
+    container_name: upstream_backup
+    ports:
+      - "8088:8080"
+    volumes:
+      - ./upstream-backup/nginx.conf:/etc/nginx/conf.d/default.conf:ro

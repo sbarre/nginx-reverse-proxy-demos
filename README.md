@@ -311,3 +311,42 @@ Visit [http://localhost:8085/](http://localhost:8085) to see the application hom
 ## Nginx Cache On Error (Port 8086)
 
 Serve a cached version when the backend is down.
+
+## Nginx with Lua (Port 8087)
+
+Use LuaJIT as a scripting language to extend nginx.
+
+**IMPORTANT:** This image is commented out of the `docker-compose.yml` file by default.
+
+You have to build this image separately first.
+
+```
+$ cd lua
+$ docker build --build-arg ENABLED_MODULES="ndk lua" -t nginx-lua .
+```
+
+This will build a local image based on `nginx:mainline-alpine` and add in the Lua module. After you have successfully built the image, you can un-comment the lines in `docker-compose.yml` to include this image.
+
+### Why do we do this?
+
+This might be my fault? For some reason doing an inline build with `docker-compose up` or `docker-compose build` fails because docker complains about needing BuildKit enabled (which should be enabled by default in Docker v23+). If anyone knows how to solve this, please open an issue!
+
+The configuration ideally would build and save the image automatically:
+
+```
+  nginx_lua:
+    container_name: nginx_lua
+    ports:
+      - "8087:8080"
+    build:
+      context: ./lua
+      args:
+        ENABLED_MODULES: ndk lua
+    volumes:
+      - ./lua/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./lua/scripts:/etc/nginx/scripts:ro
+```
+
+## Upstream Backup (Port 8088)
+
+This configuration sets 2 servers in the `upstream{}` configuration, one on port 3000 and one on port 3001, but when you visit `http://localhost:8088` you will notice that you only hit the server on port 3000. Port 3001 will only be served if the port 3000 server is detected as being down.
